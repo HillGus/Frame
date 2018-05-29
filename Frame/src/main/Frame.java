@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 public class Frame extends JFrame {
 
@@ -14,19 +13,7 @@ public class Frame extends JFrame {
 	private Map<String, JComponent> componentes = new HashMap<String, JComponent>();
 	private ArrayList<JComponent> arrayComponentes = new ArrayList<>();
 	
-	private int padding = 0;
-	
-	public static void main(String[] args) {
-		
-		Frame frame = new Frame("Teste");
-		frame.setSize(300, 300);
-		
-		frame.add(new JLabel("Teste"), "lblTeste");
-		
-		System.out.println(frame.get(JLabel.class).get(0).getText());
-		
-		frame.setVisible(true);
-	}
+	private int padding = 0, width = 0, height = 0;
 	
 	public Frame() {
 		
@@ -37,15 +24,42 @@ public class Frame extends JFrame {
 		
 		super(titulo);
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
-		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
+	public void setPadding(int padding) {
+		
+		this.padding = padding;
+	}
+
 	@Override
 	public void setSize(int width, int height) {
 		
+		this.width = width;
+		this.height = height;
+		
 		super.setSize(width + 16, height + 39);
+	}
+	
+	public void setVisible(boolean visivel) {
+		
+		this.setSize(width + padding * 2, height + padding * 2);
+		
+		super.setVisible(visivel);
+		
+		setLocationRelativeTo(null);
+	}
+	
+	public void add(JComponent comp) {
+		
+		resizeIfNeeded(comp);
+		
+		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
+		
+		comp.setLocation((int)x + padding, (int)y + padding);
+		
+		super.add(comp);
 	}
 	
 	public void add(JComponent comp, String key) {
@@ -53,7 +67,11 @@ public class Frame extends JFrame {
 		componentes.put(key, comp);
 		arrayComponentes.add(comp);
 		
-		comp.setLocation((int)comp.getLocation().getX() + padding, (int)comp.getLocation().getY() + padding);
+		resizeIfNeeded(comp);
+		
+		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
+		
+		comp.setLocation((int)x + padding, (int)y + padding);
 		
 		add(comp);
 	}
@@ -75,5 +93,16 @@ public class Frame extends JFrame {
 		}
 		
 		return comps;
+	}
+
+	private void resizeIfNeeded(JComponent comp) {
+		
+		int x = (int) comp.getLocation().getX();
+		int y = (int) comp.getLocation().getY();
+		int width = (int) comp.getSize().getWidth();
+		int height = (int) comp.getSize().getHeight();
+		
+		this.width = this.width < x + width ? x + width : this.width;
+		this.height = this.height < y + height ? y + height : this.height;
 	}
 }
