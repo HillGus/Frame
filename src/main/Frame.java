@@ -219,7 +219,7 @@ public class Frame extends JFrame {
 		if (linhas.size() > 0) {
 			for (int i = 1; i < linhas.size(); i++) {
 				
-				linhas.get(i).setIniY(colunas.get(i - 1).getFimY());
+				linhas.get(i).setIniY(linhas.get(i - 1).getFimY());
 				linhas.get(i).atualizar();
 			}
 		}

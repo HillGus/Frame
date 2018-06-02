@@ -82,7 +82,13 @@ public class Divisao {
 		
 		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
 						
-		comp.setLocation((int)x + padding, (int)y + padding);
+		if (direcao == HORIZONTAL) {
+			
+			comp.setLocation(x, y + padding);
+		} else {
+			
+			comp.setLocation(x + padding, y);
+		}
 	}
 	
 	public void atualizar() {
@@ -91,9 +97,9 @@ public class Divisao {
 			
 			ajustarComp(comp);
 			
-			reposicionar(comp);
-			
 			ajustarSize(comp);
+			
+			reposicionar(comp);
 		}
 	}
 	
