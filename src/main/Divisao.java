@@ -14,7 +14,7 @@ public class Divisao {
 	private int direcao;
 	private int margem = 0;
 	
-	private ArrayList<JComponent> componentes = new ArrayList<>();
+	private ArrayList<CompLocation> componentes = new ArrayList<>();
 	
 	public Divisao(int direcao, Frame frm) {
 		
@@ -33,16 +33,21 @@ public class Divisao {
 		this.margem = margem;
 	}
 	
-	public void add(JComponent comp) {
+	public void add(CompLocation compLocal) {
 		
-		ajustarComp(comp);
+		ajustarComp(compLocal);
 		
-		ajustarSize(comp);
+		ajustarSize(compLocal);
 		
-		componentes.add(comp);
+		atualizar();
+		
+		componentes.add(compLocal);
 	}
 	
-	private void ajustarComp(JComponent comp) {
+	private void ajustarComp(CompLocation compLocal) {
+		
+		JComponent comp = compLocal.getComp();
+		int location = compLocal.getLocation();
 		
 		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
 		
@@ -57,7 +62,9 @@ public class Divisao {
 		
 	}
 	
-	private void ajustarSize(JComponent comp) {
+	private void ajustarSize(CompLocation compLocal) {
+		
+		JComponent comp = compLocal.getComp();
 		
 		int width = (int) comp.getSize().getWidth(), height = (int) comp.getSize().getHeight();
 		
@@ -76,24 +83,38 @@ public class Divisao {
 		}
 	}
 	
-	private void reposicionar(JComponent comp) {
+	private void reposicionar(CompLocation compLocal) {
+		
+		JComponent comp = compLocal.getComp();
+		int location = compLocal.getLocation();
 		
 		int padding = frm.getPadding();
 		
 		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
-						
+		int width = (int) comp.getSize().getWidth(), height = (int) comp.getSize().getHeight();				
+		
 		if (direcao == HORIZONTAL) {
 			
-			comp.setLocation(x, y + padding);
+			switch (location) {
+			
+				case CompLocation.TOP: comp.setLocation(x, y + padding); break;
+				case CompLocation.CENTER: comp.setLocation(x, iniY + ((fimY - margem - iniY) / 2) - (height / 2) + padding); break;
+				case CompLocation.BOTTOM: comp.setLocation(x, (fimY - iniY) - height + padding); break;
+			}
 		} else {
 			
-			comp.setLocation(x + padding, y);
+			switch (location) {
+			
+				case CompLocation.LEFT: comp.setLocation(x + padding, y); break;
+				case CompLocation.CENTER: comp.setLocation(iniX + ((fimX - margem - iniX) / 2) - (width / 2) + padding, y); break; 
+				case CompLocation.RIGHT: comp.setLocation((fimX - iniX) - width + padding, y); break;
+			}
 		}
 	}
-	
+		
 	public void atualizar() {
 		
-		for (JComponent comp : componentes) {
+		for (CompLocation comp : componentes) {
 			
 			ajustarComp(comp);
 			

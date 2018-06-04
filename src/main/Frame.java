@@ -13,31 +13,35 @@ import javax.swing.SwingConstants;
 public class Frame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final int COMP_DEFAULT = CompLocation.DEFAULT, COMP_CENTER = CompLocation.CENTER, COMP_TOP = CompLocation.TOP, 
+							 COMP_BOTTOM = CompLocation.BOTTOM, COMP_LEFT = CompLocation.LEFT, COMP_RIGHT = CompLocation.RIGHT;
+	
 	private Map<String, JComponent> componentes = new HashMap<String, JComponent>();
 	private ArrayList<JComponent> arrayComponentes = new ArrayList<>();
 	
 	private ArrayList<Divisao> linhas = new ArrayList<>();
 	private ArrayList<Divisao> colunas = new ArrayList<>();
 	
-	private int padding = 0, width = 0, height = 0, divMargem = 0;
+	private int padding = 0, width = 0, height = 0;
+	
+	private int rowMargin = 0, colMargin = 0; 
 	
 	public static void main(String args[]) {
 		
 		Frame frm = new Frame();
 		frm.setPadding(15);
+		frm.setColMargin(15);
+		frm.setRowMargin(15);
 		
 		JLabel lbl1 = new JLabel();
 		lbl1.setSize(100, 100);
 		lbl1.setOpaque(true);
 		lbl1.setBackground(Color.BLACK);
 		
-		JLabel lbl2 = new JLabel();
-		lbl2.setSize(100, 100);
-		lbl2.setOpaque(true);
-		lbl2.setBackground(Color.BLUE);
-		
 		JLabel lbl3 = new JLabel();
 		lbl3.setSize(100, 100);
+		lbl3.setLocation(150, 150);
 		lbl3.setOpaque(true);
 		lbl3.setBackground(Color.RED);
 		
@@ -49,20 +53,18 @@ public class Frame extends JFrame {
 		JLabel lbl5 = new JLabel();
 		lbl5.setSize(150, 150);
 		lbl5.setOpaque(true);
-		lbl5.setBackground(Color.CYAN);
+		lbl5.setBackground(Color.BLUE);
 		
-		frm.add(lbl1, 1, 1);		
-		frm.add(lbl2, 2, 1);
-		frm.add(lbl3, 2, 2);
+		JLabel lbl6 = new JLabel();
+		lbl6.setSize(100, 100);
+		lbl6.setOpaque(true);
+		lbl6.setBackground(Color.CYAN);
+		
+		frm.add(lbl1, 1, 1);	
+		frm.add(lbl3, 2, 1, COMP_CENTER, COMP_CENTER);
 		frm.add(lbl5, 2, 1);
-		
-		frm.setVisible(true);
-		
-		try {
-			Thread.sleep(1000);
-		} catch (Exception e) {}
-		
 		frm.add(lbl4, 3, 2);
+		frm.add(lbl6, 3, 3);
 		
 		frm.setVisible(true);
 	}
@@ -70,8 +72,6 @@ public class Frame extends JFrame {
 	public Frame() {
 		
 		this("");
-		
-		setDivMargem(15);
 	}
 	
 	public Frame(String titulo) {
@@ -95,9 +95,14 @@ public class Frame extends JFrame {
 		return this.padding;
 	}
 	
-	public void setDivMargem(int margem) {
+	public void setRowMargin(int rowMargin) {
 		
-		this.divMargem = margem;
+		this.rowMargin = rowMargin;
+	}
+	
+	public void setColMargin(int colMargin) {
+		
+		this.colMargin = colMargin;
 	}
 
 	private void addLinha() {
@@ -110,7 +115,7 @@ public class Frame extends JFrame {
 		}
 		
 		Divisao div = new Divisao(Divisao.HORIZONTAL, this);
-		div.setMargem(divMargem);
+		div.setMargem(rowMargin);
 		div.setIniY(iniY);
 		
 		linhas.add(div);
@@ -127,7 +132,7 @@ public class Frame extends JFrame {
 		}
 		
 		Divisao div = new Divisao(Divisao.VERTICAL, this);
-		div.setMargem(divMargem);
+		div.setMargem(colMargin);
 		div.setIniX(iniX);
 		
 		colunas.add(div);
@@ -188,7 +193,12 @@ public class Frame extends JFrame {
 		add(comp);
 	}
 	
-	public void add(JComponent comp, int linha, int coluna) {	
+	public void add(JComponent comp, int linha, int coluna) {
+		
+		add(comp, linha, coluna, COMP_DEFAULT, COMP_DEFAULT);
+	}
+	
+	public void add(JComponent comp, int linha, int coluna, int posLinha, int posColuna) {	
 		
 		if (linha == linhas.size() + 1) {		
 			addLinha();
@@ -200,8 +210,44 @@ public class Frame extends JFrame {
 			
 		atualizarDivisoes();
 		
-		linhas.get(linha - 1).add(comp);
-		colunas.get(coluna - 1).add(comp);
+		linhas.get(linha - 1).add(new CompLocation(comp, posLinha));
+		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna));
+		
+		add(comp);
+	}
+	
+	public void addAtRow(JComponent comp, int linha) {
+		
+		addAtRow(comp, linha, COMP_DEFAULT);
+	}
+	
+	public void addAtRow(JComponent comp, int linha, int posLinha) {
+		
+		if (linha == linhas.size() + 1) {
+			addLinha();
+		}
+		
+		atualizarDivisoes();
+		
+		linhas.get(linha - 1).add(new CompLocation(comp, posLinha));
+		
+		add(comp);
+	}
+	
+	public void addAtCol(JComponent comp, int coluna) {
+		
+		addAtCol(comp, coluna, COMP_DEFAULT);
+	}
+	
+	public void addAtCol(JComponent comp, int coluna, int posColuna) {
+		
+		if (coluna == colunas.size() + 1) {
+			addColuna();
+		}
+		
+		atualizarDivisoes();
+		
+		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna));
 		
 		add(comp);
 	}
