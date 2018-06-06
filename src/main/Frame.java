@@ -1,18 +1,20 @@
 package main;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
-public class Frame extends JFrame {
+public class Frame extends JFrame implements DivBounds {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final int COMP_DEFAULT = CompLocation.DEFAULT, COMP_CENTER = CompLocation.CENTER, COMP_TOP = CompLocation.TOP, 
-							 COMP_BOTTOM = CompLocation.BOTTOM, COMP_LEFT = CompLocation.LEFT, COMP_RIGHT = CompLocation.RIGHT;
+	public static final int CENTER = CompLocation.CENTER, TOP = CompLocation.TOP, 
+							BOTTOM = CompLocation.BOTTOM, LEFT = CompLocation.LEFT, RIGHT = CompLocation.RIGHT;
 	
 	public static final int LEFT_TOP = 1,	 MIDDLE_TOP = 2,    RIGHT_TOP = 3,
 							LEFT_CENTER = 4, MIDDLE_CENTER = 5, RIGHT_CENTER = 6,
@@ -35,6 +37,15 @@ public class Frame extends JFrame {
 		frm.setPadding(15);
 		frm.setColMargin(15);
 		frm.setRowMargin(15);
+		
+		JLabel lbl = new JLabel("Teste");
+		lbl.setSize((int) lbl.getPreferredSize().getWidth(), (int) lbl.getPreferredSize().getHeight());
+		
+		JLabel lbl1 = new JLabel();
+		lbl1.setSize(200, 200);
+		
+		frm.add(lbl1);
+		frm.add(lbl, MIDDLE_CENTER);
 		
 		frm.setVisible(true);
 	}
@@ -120,6 +131,18 @@ public class Frame extends JFrame {
 		ajustarLocalizacoes();
 	}
 	
+	@Override
+	public int getWidth() {
+		
+		return super.getWidth() - padding * 2 - 16;
+	}
+	
+	@Override
+	public int getHeight() {
+		
+		return super.getHeight() - padding * 2 - 39;
+	}
+	
 	public void setVisible(boolean visivel) {
 		
 		//Adiciona a margem interna ao frame
@@ -143,28 +166,9 @@ public class Frame extends JFrame {
 		
 		for (CompLocation compLocal : arrayCompLocation) {
 			
-			JComponent comp = compLocal.getComp();
-			int local = compLocal.getLocation();
+			compLocal.atualizar();
 			
-			int compWidth = (int) comp.getSize().getWidth(), compHeight = (int) comp.getSize().getHeight();
-			int frmWidth = (int) getWidth(), frmHeight = (int) getHeight();			
-			
-			switch (local) {
-			
-				case LEFT_TOP: comp.setLocation(0, 0); break;
-				case MIDDLE_TOP: comp.setLocation(frmWidth / 2 - compWidth / 2, 0); break;
-				case RIGHT_TOP: comp.setLocation(frmWidth - compWidth, 0); break;
-				
-				case LEFT_CENTER: comp.setLocation(0 , frmHeight / 2 - compHeight / 2); break;
-				case MIDDLE_CENTER: comp.setLocation(frmWidth / 2 - compWidth / 2, frmHeight / 2 - compHeight / 2); break;
-				case RIGHT_CENTER: comp.setLocation(frmWidth - compWidth, frmHeight / 2 - compHeight / 2); break;
-				
-				case LEFT_BOTTOM: comp.setLocation(0, frmHeight - compHeight); break;
-				case MIDDLE_BOTTOM: comp.setLocation(frmWidth / 2 - compWidth / 2, frmHeight - compHeight); break;
-				case RIGHT_BOTTOM: comp.setLocation(frmWidth - compWidth, frmHeight - compHeight); break;
-			}
-			
-			reposicionar(comp);
+			reposicionar(compLocal.getComp());
 		}
 	}
 	
@@ -173,6 +177,8 @@ public class Frame extends JFrame {
 		resizeIfNeeded(comp);
 		
 		reposicionar(comp);
+		
+		ajustarLocalizacoes();
 		
 		super.add(comp);
 	}
@@ -196,16 +202,14 @@ public class Frame extends JFrame {
 	
 	public void add(JComponent comp, int local) {
 		
-		arrayCompLocation.add(new CompLocation(comp, local));
-		
-		ajustarLocalizacoes();
+		arrayCompLocation.add(new CompLocation(comp, local, this));
 		
 		add(comp);
 	}
 	
 	public void add(JComponent comp, int linha, int coluna) {
 		
-		add(comp, linha, coluna, COMP_DEFAULT, COMP_DEFAULT);
+		add(comp, linha, coluna, TOP, LEFT);
 	}
 	
 	public void add(JComponent comp, int linha, int coluna, int posLinha, int posColuna) {	
@@ -220,15 +224,15 @@ public class Frame extends JFrame {
 			
 		atualizarDivisoes();
 		
-		linhas.get(linha - 1).add(new CompLocation(comp, posLinha));
-		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna));
+		linhas.get(linha - 1).add(new CompLocation(comp, posLinha, this));
+		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna, this));
 		
 		add(comp);
 	}
 	
 	public void addAtRow(JComponent comp, int linha) {
 		
-		addAtRow(comp, linha, COMP_DEFAULT);
+		addAtRow(comp, linha, TOP);
 	}
 	
 	public void addAtRow(JComponent comp, int linha, int posLinha) {
@@ -239,14 +243,14 @@ public class Frame extends JFrame {
 		
 		atualizarDivisoes();
 		
-		linhas.get(linha - 1).add(new CompLocation(comp, posLinha));
+		linhas.get(linha - 1).add(new CompLocation(comp, posLinha, this));
 		
 		add(comp);
 	}
 	
 	public void addAtCol(JComponent comp, int coluna) {
 		
-		addAtCol(comp, coluna, COMP_DEFAULT);
+		addAtCol(comp, coluna, LEFT);
 	}
 	
 	public void addAtCol(JComponent comp, int coluna, int posColuna) {
@@ -257,7 +261,7 @@ public class Frame extends JFrame {
 		
 		atualizarDivisoes();
 		
-		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna));
+		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna, this));
 		
 		add(comp);
 	}

@@ -47,7 +47,6 @@ public class Divisao {
 	private void ajustarComp(CompLocation compLocal) {
 		
 		JComponent comp = compLocal.getComp();
-		int location = compLocal.getLocation();
 		
 		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
 		
@@ -85,31 +84,7 @@ public class Divisao {
 	
 	private void reposicionar(CompLocation compLocal) {
 		
-		JComponent comp = compLocal.getComp();
-		int location = compLocal.getLocation();
-		
-		int padding = frm.getPadding();
-		
-		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
-		int width = (int) comp.getSize().getWidth(), height = (int) comp.getSize().getHeight();				
-		
-		if (direcao == HORIZONTAL) {
-			
-			switch (location) {
-			
-				case CompLocation.TOP: comp.setLocation(x, y + padding); break;
-				case CompLocation.CENTER: comp.setLocation(x, iniY + ((fimY - margem - iniY) / 2) - (height / 2) + padding); break;
-				case CompLocation.BOTTOM: comp.setLocation(x, (fimY - iniY) - height + padding); break;
-			}
-		} else {
-			
-			switch (location) {
-			
-				case CompLocation.LEFT: comp.setLocation(x + padding, y); break;
-				case CompLocation.CENTER: comp.setLocation(iniX + ((fimX - margem - iniX) / 2) - (width / 2) + padding, y); break; 
-				case CompLocation.RIGHT: comp.setLocation((fimX - iniX) - width + padding, y); break;
-			}
-		}
+		compLocal.atualizar();
 	}
 		
 	public void atualizar() {
@@ -126,12 +101,12 @@ public class Divisao {
 	
 	public void setIniX(int iniX) {
 		
-		this.iniX = iniX;
+		this.iniX = iniX + frm.getPadding();
 	}
 	
 	public void setIniY(int iniY) {
 		
-		this.iniY = iniY;
+		this.iniY = iniY + frm.getPadding();
 	}
 	
 	public int getIniX() {
