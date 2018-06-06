@@ -1,24 +1,26 @@
 package main;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 public class Frame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final int COMP_DEFAULT = CompLocation.DEFAULT, COMP_CENTER = CompLocation.CENTER, COMP_TOP = CompLocation.TOP, 
+	public static final int COMP_DEFAULT = CompLocation.DEFAULT, COMP_CENTER = CompLocation.CENTER, COMP_TOP = CompLocation.TOP, 
 							 COMP_BOTTOM = CompLocation.BOTTOM, COMP_LEFT = CompLocation.LEFT, COMP_RIGHT = CompLocation.RIGHT;
+	
+	public static final int LEFT_TOP = 1,	 MIDDLE_TOP = 2,    RIGHT_TOP = 3,
+							LEFT_CENTER = 4, MIDDLE_CENTER = 5, RIGHT_CENTER = 6,
+							LEFT_BOTTOM = 7, MIDDLE_BOTTOM = 8, RIGHT_BOTTOM = 9;
 	
 	private Map<String, JComponent> componentes = new HashMap<String, JComponent>();
 	private ArrayList<JComponent> arrayComponentes = new ArrayList<>();
+	private ArrayList<CompLocation> arrayCompLocation = new ArrayList<>();
 	
 	private ArrayList<Divisao> linhas = new ArrayList<>();
 	private ArrayList<Divisao> colunas = new ArrayList<>();
@@ -33,38 +35,6 @@ public class Frame extends JFrame {
 		frm.setPadding(15);
 		frm.setColMargin(15);
 		frm.setRowMargin(15);
-		
-		JLabel lbl1 = new JLabel();
-		lbl1.setSize(100, 100);
-		lbl1.setOpaque(true);
-		lbl1.setBackground(Color.BLACK);
-		
-		JLabel lbl3 = new JLabel();
-		lbl3.setSize(100, 100);
-		lbl3.setLocation(150, 150);
-		lbl3.setOpaque(true);
-		lbl3.setBackground(Color.RED);
-		
-		JLabel lbl4 = new JLabel();
-		lbl4.setSize(100, 100);
-		lbl4.setOpaque(true);
-		lbl4.setBackground(Color.GREEN);
-		
-		JLabel lbl5 = new JLabel();
-		lbl5.setSize(150, 150);
-		lbl5.setOpaque(true);
-		lbl5.setBackground(Color.BLUE);
-		
-		JLabel lbl6 = new JLabel();
-		lbl6.setSize(100, 100);
-		lbl6.setOpaque(true);
-		lbl6.setBackground(Color.CYAN);
-		
-		frm.add(lbl1, 1, 1);	
-		frm.add(lbl3, 2, 1, COMP_CENTER, COMP_CENTER);
-		frm.add(lbl5, 2, 1);
-		frm.add(lbl4, 3, 2);
-		frm.add(lbl6, 3, 3);
 		
 		frm.setVisible(true);
 	}
@@ -146,6 +116,8 @@ public class Frame extends JFrame {
 		
 		//Define a dimensão do frame do tamanho que o pane interno fique com os parâmetros informados
 		super.setSize(width + 16, height + 39);
+		
+		ajustarLocalizacoes();
 	}
 	
 	public void setVisible(boolean visivel) {
@@ -165,6 +137,35 @@ public class Frame extends JFrame {
 				
 		//define a localização do componente de acordo com a margem interna
 		comp.setLocation((int)x + padding, (int)y + padding);
+	}
+	
+	private void ajustarLocalizacoes() {
+		
+		for (CompLocation compLocal : arrayCompLocation) {
+			
+			JComponent comp = compLocal.getComp();
+			int local = compLocal.getLocation();
+			
+			int compWidth = (int) comp.getSize().getWidth(), compHeight = (int) comp.getSize().getHeight();
+			int frmWidth = (int) getWidth(), frmHeight = (int) getHeight();			
+			
+			switch (local) {
+			
+				case LEFT_TOP: comp.setLocation(0, 0); break;
+				case MIDDLE_TOP: comp.setLocation(frmWidth / 2 - compWidth / 2, 0); break;
+				case RIGHT_TOP: comp.setLocation(frmWidth - compWidth, 0); break;
+				
+				case LEFT_CENTER: comp.setLocation(0 , frmHeight / 2 - compHeight / 2); break;
+				case MIDDLE_CENTER: comp.setLocation(frmWidth / 2 - compWidth / 2, frmHeight / 2 - compHeight / 2); break;
+				case RIGHT_CENTER: comp.setLocation(frmWidth - compWidth, frmHeight / 2 - compHeight / 2); break;
+				
+				case LEFT_BOTTOM: comp.setLocation(0, frmHeight - compHeight); break;
+				case MIDDLE_BOTTOM: comp.setLocation(frmWidth / 2 - compWidth / 2, frmHeight - compHeight); break;
+				case RIGHT_BOTTOM: comp.setLocation(frmWidth - compWidth, frmHeight - compHeight); break;
+			}
+			
+			reposicionar(comp);
+		}
 	}
 	
 	public void add(JComponent comp) {
@@ -189,6 +190,15 @@ public class Frame extends JFrame {
 		
 		//Define a localização do componente de acordo com a margem interna
 		comp.setLocation((int)x + padding, (int)y + padding);
+		
+		add(comp);
+	}
+	
+	public void add(JComponent comp, int local) {
+		
+		arrayCompLocation.add(new CompLocation(comp, local));
+		
+		ajustarLocalizacoes();
 		
 		add(comp);
 	}
