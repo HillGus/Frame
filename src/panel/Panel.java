@@ -1,15 +1,17 @@
-package main;
+package panel;
 
-import java.awt.Dimension;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-public class Frame extends JFrame implements DivBounds {
+public class Panel extends JPanel implements DivBounds {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -31,39 +33,44 @@ public class Frame extends JFrame implements DivBounds {
 	
 	private int rowMargin = 0, colMargin = 0; 
 	
+	
 	public static void main(String args[]) {
 		
-		Frame frm = new Frame();
-		frm.setPadding(15);
-		frm.setColMargin(15);
-		frm.setRowMargin(15);
+		JFrame frame = new JFrame("Cadastro Usuário");
+		
+		Panel pnl = new Panel();
+		pnl.setBackground(Color.BLUE);
+		
+		frame.setContentPane(pnl);
+		frame.setSize(316, 339);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+		
+		pnl.setPadding(25);
+		pnl.setRowMargin(-50);
 		
 		JLabel lbl = new JLabel("Teste");
-		lbl.setSize((int) lbl.getPreferredSize().getWidth(), (int) lbl.getPreferredSize().getHeight());
+		lbl.setSize(100, 25);
+		lbl.setLocation(0, 0);
 		
-		JLabel lbl1 = new JLabel();
-		lbl1.setSize(200, 200);
+		pnl.add(lbl, 1, 1);
 		
-		frm.add(lbl1);
-		frm.add(lbl, MIDDLE_CENTER);
+		JButton btn = new JButton("TEASD");
+		btn.setSize(100, 25);
 		
-		frm.setVisible(true);
+		pnl.add(btn, 2, 1);
+		
+		//pnl.add(new JLabel(), 2, 1);
+		
+		frame.setVisible(true);
 	}
 	
-	public Frame() {
-		
-		this("");
-	}
 	
-	public Frame(String titulo) {
+	public Panel() {
 		
-		//Cria um JFrame
-		super(titulo);
-		
-		//Configura o JFrame
 		setLayout(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+	
 	
 	//Define a margem interna do frame
 	public void setPadding(int padding) {
@@ -85,98 +92,20 @@ public class Frame extends JFrame implements DivBounds {
 		
 		this.colMargin = colMargin;
 	}
-
-	private void addLinha() {
-		
-		int iniY = 0;
-		if (linhas.size() > 0) {
-			
-			Divisao d = linhas.get(linhas.size() - 1);
-			iniY = d.getFimY();
-		}
-		
-		Divisao div = new Divisao(Divisao.HORIZONTAL, this);
-		div.setMargem(rowMargin);
-		div.setIniY(iniY);
-		
-		linhas.add(div);
-	}
-	
-	private void addColuna() {
-		
-		int iniX = 0;
-		
-		if (colunas.size() > 0) {
-			
-			Divisao d = colunas.get(colunas.size() - 1);
-			iniX = d.getFimX();
-		}
-		
-		Divisao div = new Divisao(Divisao.VERTICAL, this);
-		div.setMargem(colMargin);
-		div.setIniX(iniX);
-		
-		colunas.add(div);
-	}
 	
 	@Override
 	public void setSize(int width, int height) {
 		
-		this.width = width;
-		this.height = height;
-		
-		//Define a dimensão do frame do tamanho que o pane interno fique com os parâmetros informados
-		super.setSize(width + 16, height + 39);
+		super.setSize(width, height);
 		
 		ajustarLocalizacoes();
 	}
-	
-	@Override
-	public int getWidth() {
 		
-		return super.getWidth() - padding * 2 - 16;
-	}
-	
-	@Override
-	public int getHeight() {
-		
-		return super.getHeight() - padding * 2 - 39;
-	}
-	
-	public void setVisible(boolean visivel) {
-		
-		//Adiciona a margem interna ao frame
-		this.setSize(width + padding * 2, height + padding * 2);
-		
-		super.setVisible(visivel);
-		
-		setLocationRelativeTo(null);
-	}
-	
-	private void reposicionar(JComponent comp) {
-		
-		//Obtem x e y do componente
-		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
-				
-		//define a localização do componente de acordo com a margem interna
-		comp.setLocation((int)x + padding, (int)y + padding);
-	}
-	
-	private void ajustarLocalizacoes() {
-		
-		for (CompLocation compLocal : arrayCompLocation) {
-			
-			compLocal.atualizar();
-			
-			reposicionar(compLocal.getComp());
-		}
-	}
-	
 	public void add(JComponent comp) {
 		
-		resizeIfNeeded(comp);
-		
 		reposicionar(comp);
+		
+		resizeIfNeeded(comp);
 		
 		ajustarLocalizacoes();
 		
@@ -185,17 +114,8 @@ public class Frame extends JFrame implements DivBounds {
 	
 	public void add(JComponent comp, String key) {
 		
-		//Adiciona o componente no dicionário e no array
 		componentes.put(key, comp);
 		arrayComponentes.add(comp);
-		
-		resizeIfNeeded(comp);
-		
-		//Obtem x e y do componente
-		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
-		
-		//Define a localização do componente de acordo com a margem interna
-		comp.setLocation((int)x + padding, (int)y + padding);
 		
 		add(comp);
 	}
@@ -209,10 +129,26 @@ public class Frame extends JFrame implements DivBounds {
 	
 	public void add(JComponent comp, int linha, int coluna) {
 		
-		add(comp, linha, coluna, TOP, LEFT);
+		add(comp, linha, coluna, null);
+	}
+	
+	public void add(JComponent comp, int linha, int coluna, String key) {
+		
+		if (key != null) {
+			
+			componentes.put(key,  comp);
+			arrayComponentes.add(comp);
+		}
+		
+		add(comp, linha, coluna, TOP, LEFT, key);
 	}
 	
 	public void add(JComponent comp, int linha, int coluna, int posLinha, int posColuna) {	
+		
+		add(comp, linha, coluna, posLinha, posColuna, null);
+	}
+	
+	public void add(JComponent comp, int linha, int coluna, int posLinha, int posColuna, String key) {
 		
 		if (linha == linhas.size() + 1) {		
 			addLinha();
@@ -222,12 +158,12 @@ public class Frame extends JFrame implements DivBounds {
 			addColuna();
 		}
 			
+		linhas.get(linha - 1).add(new CompLocation(comp, posLinha, linhas.get(linha-1)));
+		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna, colunas.get(coluna-1)));
+		
 		atualizarDivisoes();
 		
-		linhas.get(linha - 1).add(new CompLocation(comp, posLinha, this));
-		colunas.get(coluna - 1).add(new CompLocation(comp, posColuna, this));
-		
-		add(comp);
+		add(comp, key);
 	}
 	
 	public void addAtRow(JComponent comp, int linha) {
@@ -265,6 +201,50 @@ public class Frame extends JFrame implements DivBounds {
 		
 		add(comp);
 	}
+		
+	@SuppressWarnings("unchecked")
+	public <T extends JComponent> T get(String key) {
+		
+		return (T) componentes.get(key);
+	}
+	
+	public <T> ArrayList<T> get(Class<T> classe) {
+		
+		//Cria um arrayList da classe informada
+		ArrayList<T> comps = new ArrayList<>();
+		
+		//Adiciona os componentes que forem daquela classe ao arraylist
+		for (JComponent comp : arrayComponentes) {
+			
+			try {
+				comps.add(classe.cast(comp));
+			} catch (Exception e) {}
+		}
+		
+		return comps;
+	}
+
+	
+	private void reposicionar(JComponent comp) {
+		
+		//Obtem x e y do componente
+		int x = (int) comp.getLocation().getX(), y = (int) comp.getLocation().getY();
+		
+		//define a localização do componente de acordo com a margem interna
+		comp.setLocation((int)x + padding, (int)y + padding);
+	}
+	
+	private void ajustarLocalizacoes() {
+		
+		for (CompLocation compLocal : arrayCompLocation) {
+			
+			compLocal.atualizar();
+			
+			reposicionar(compLocal.getComp());
+			
+			resizeIfNeeded(compLocal.getComp());
+		}
+	}
 	
 	private void atualizarDivisoes() {
 		
@@ -285,27 +265,39 @@ public class Frame extends JFrame implements DivBounds {
 		}
 	}
 	
-	public JComponent get(String key) {
+	private void addLinha() {
 		
-		return componentes.get(key);
-	}
-	
-	public <T> ArrayList<T> get(Class<T> classe) {
-		
-		//Cria um arrayList da classe informada
-		ArrayList<T> comps = new ArrayList<>();
-		
-		//Adiciona os componentes que forem daquela classe ao arraylist
-		for (JComponent comp : arrayComponentes) {
+		int iniY = 0;
+		if (linhas.size() > 0) {
 			
-			try {
-				comps.add(classe.cast(comp));
-			} catch (Exception e) {}
+			Divisao d = linhas.get(linhas.size() - 1);
+			iniY = d.getFimY();
 		}
 		
-		return comps;
+		Divisao div = new Divisao(Divisao.HORIZONTAL, this);
+		div.setMargem(rowMargin);
+		div.setIniY(iniY);
+		
+		linhas.add(div);
 	}
-
+	
+	private void addColuna() {
+		
+		int iniX = 0;
+		
+		if (colunas.size() > 0) {
+			
+			Divisao d = colunas.get(colunas.size() - 1);
+			iniX = d.getFimX();
+		}
+		
+		Divisao div = new Divisao(Divisao.VERTICAL, this);
+		div.setMargem(colMargin);
+		div.setIniX(iniX);
+		
+		colunas.add(div);
+	}
+	
 	private void resizeIfNeeded(JComponent comp) {
 		
 		int x = (int) comp.getLocation().getX();
@@ -316,5 +308,30 @@ public class Frame extends JFrame implements DivBounds {
 		//Aumenta o tamanho do Frame caso ele não seja grande o suficiente para os componentes
 		this.width = this.width < x + width ? x + width : this.width;
 		this.height = this.height < y + height ? y + height : this.height;
+	}
+
+
+	@Override
+	public int getX() {
+		
+		return (int) this.getLocation().getX();
+	}
+
+	@Override
+	public int getY() {
+		
+		return (int) this.getLocation().getY();
+	}
+
+	@Override
+	public int getWidth() {
+		
+		return (int) this.getSize().getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		
+		return (int) this.getSize().getHeight();
 	}
 }

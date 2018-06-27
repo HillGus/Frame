@@ -1,4 +1,4 @@
-package main;
+package panel;
 
 public interface DivBounds {
 

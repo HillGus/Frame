@@ -1,14 +1,14 @@
-package main;
+package panel;
 
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
-public class Divisao {
+public class Divisao implements DivBounds {
 
 	public static final int HORIZONTAL = 0, VERTICAL = 1;
 	
-	private Frame frm;
+	private Panel frm;
 	
 	private int iniX, fimX, iniY, fimY;
 	private int direcao;
@@ -16,7 +16,7 @@ public class Divisao {
 	
 	private ArrayList<CompLocation> componentes = new ArrayList<>();
 	
-	public Divisao(int direcao, Frame frm) {
+	public Divisao(int direcao, Panel frm) {
 		
 		this.frm = frm;
 		
@@ -35,13 +35,9 @@ public class Divisao {
 	
 	public void add(CompLocation compLocal) {
 		
-		ajustarComp(compLocal);
-		
-		ajustarSize(compLocal);
+		componentes.add(compLocal);
 		
 		atualizar();
-		
-		componentes.add(compLocal);
 	}
 	
 	private void ajustarComp(CompLocation compLocal) {
@@ -57,8 +53,6 @@ public class Divisao {
 			
 			comp.setLocation(iniX, y);
 		}
-		
-		
 	}
 	
 	private void ajustarSize(CompLocation compLocal) {
@@ -127,5 +121,30 @@ public class Divisao {
 	public int getFimY() {
 		
 		return this.fimY;
+	}
+
+	
+	@Override
+	public int getX() {
+		
+		return getIniX();
+	}
+
+	@Override
+	public int getY() {
+		
+		return getIniY();
+	}
+
+	@Override
+	public int getWidth() {
+		
+		return getFimX() - getIniX();
+	}
+
+	@Override
+	public int getHeight() {
+		
+		return getFimY() - getIniY();
 	}
 }
